@@ -50,10 +50,13 @@ def add_up_num_infection( df_area, area, first_day, last_day, df_num ):
                             [infection_date, 
                              area,
                              num_infection_people,
+                             0,
                              num_total_infection_people],
                              index = df_num.columns)
         # 作成したSeriesをdf_numに追加する
         df_num = df_num.append(s_infection, ignore_index=True)
+        # 日別感染者数の７日間移動平均を計算して格納する
+        df_num['週平均'] = df_num['日別'].rolling(7).mean()
     # 集計結果を返す
     return df_num    
 
@@ -62,8 +65,8 @@ def add_up_num_infection( df_area, area, first_day, last_day, df_num ):
 
 
 #集計結果を格納するためのDataFrameを宣言する
-df_area_num = pd.DataFrame(columns=['日付', '区域', '日別', '累計'])
-df_town_num = pd.DataFrame(columns=['日付', '市町村', '日別', '累計'])
+df_areas_num = pd.DataFrame(columns=['日付', '区域', '日別', '週平均', '累計'])
+df_towns_num = pd.DataFrame(columns=['日付', '市町村', '日別', '週平均', '累計'])
 
 # 元データを読み込む
 df_source = pd.read_excel(source_filename)
@@ -117,13 +120,22 @@ for area in areas:
     print('\r{0}        '.format(area), end='')
     # 区域単位のデータを抽出する
     df_area = df_source[ df_source['区域']==area ]
+    # 区域単位の集計結果を格納するためのデータフレームを宣言する
+    df_area_num = pd.DataFrame(columns=['日付', '区域', '日別', '週平均', '累計'])
     # 集計する
     df_area_num = add_up_num_infection( df_area, area, first_day, last_day, df_area_num )
+    # 区域全体の集計結果に追加格納する
+    df_areas_num = df_areas_num.append(df_area_num, ignore_index=True)
 # 全域で集計する(おまけ)
 print('\r全域        ', end='')
+# 区域単位の集計結果を格納するためのデータフレームを宣言する
+df_area_num = pd.DataFrame(columns=['日付', '区域', '日別', '週平均', '累計'])
+# 集計する
 df_area_num = add_up_num_infection( df_source, '全域', first_day, last_day, df_area_num )
+# 区域全体の集計結果に追加格納する
+df_areas_num = df_areas_num.append(df_area_num, ignore_index=True)
 # 結果をExcelファイルに出力する
-df_area_num.to_excel(area_output_filename)
+df_areas_num.to_excel(area_output_filename)
 
 # 市町村単位で集計する
 # 市町村の一覧を抽出する
@@ -133,12 +145,22 @@ for town in towns:
     print('\r{0}        '.format(town), end='')
     # 市町村単位のデータを抽出する
     df_town = df_source[ df_source['市町村']==town ]
+    # 市町村単位の集計結果を格納するためのデータフレームを宣言する
+    df_town_num = pd.DataFrame(columns=['日付', '市町村', '日別', '週平均', '累計'])
     # 集計する
     df_town_num = add_up_num_infection( df_town, town, first_day, last_day, df_town_num )
+    # 区域全体の集計結果に追加格納する
+    df_towns_num = df_towns_num.append(df_town_num, ignore_index=True)
 # 結果をExcelファイルに出力する
-df_town_num.to_excel(town_output_filename)
+df_towns_num.to_excel(town_output_filename)
 
 print('\rFinish !              ')
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
