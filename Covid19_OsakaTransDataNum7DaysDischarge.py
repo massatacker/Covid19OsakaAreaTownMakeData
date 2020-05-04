@@ -77,6 +77,15 @@ def add_up_num_infection( df_area, area, first_day, last_day, df_num ):
 # In[ ]:
 
 
+# 退院していない陽性者の累計を計算する
+def Cal_TotalPositivePerson(df_num):
+    df_num['陽性者累計'] = df_num['累計'] - df_num['退院・解除累計']
+    return df_num
+
+
+# In[ ]:
+
+
 #集計結果を格納するためのDataFrameを宣言する
 df_areas_num = pd.DataFrame(columns=clmns_area)
 df_towns_num = pd.DataFrame(columns=clmns_town)
@@ -147,6 +156,8 @@ df_area_num = pd.DataFrame(columns=clmns_area)
 df_area_num = add_up_num_infection( df_source, '全域', first_day, last_day, df_area_num )
 # 区域全体の集計結果に追加格納する
 df_areas_num = df_areas_num.append(df_area_num, ignore_index=True)
+# 退院していない陽性者の累計を計算する
+#df_areas_num = Cal_TotalPositivePerson(df_areas_num)
 # 結果をExcelファイルに出力する
 df_areas_num.to_excel(area_output_filename)
 
@@ -164,20 +175,10 @@ for town in towns:
     df_town_num = add_up_num_infection( df_town, town, first_day, last_day, df_town_num )
     # 区域全体の集計結果に追加格納する
     df_towns_num = df_towns_num.append(df_town_num, ignore_index=True)
+# 退院していない陽性者の累計を計算する
+#df_towns_num = Cal_TotalPositivePerson(df_towns_num)
 # 結果をExcelファイルに出力する
 df_towns_num.to_excel(town_output_filename)
 
 print('\rFinish !              ')
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
