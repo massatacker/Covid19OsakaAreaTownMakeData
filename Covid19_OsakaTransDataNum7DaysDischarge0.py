@@ -110,7 +110,7 @@ df_source['日付']=pd.to_datetime(df_source['日付'], format='%Y/%m/%d')
 # データ格納開始日と終了日を決定する
 first_day = df_source.iloc[-1]['日付']
 #last_day = df_source.iloc[0]['日付']
-last_day = datetime(2020, 5, 28)
+last_day = datetime(2020, 6, 23)
 
 
 # In[ ]:
